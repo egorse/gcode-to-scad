@@ -1,9 +1,18 @@
-var input_filename = '../examples/cube/cube.gcode';
+var version='0.0.1';
+if (process.argv.length <= 2) {
+    console.log('gcode-to-scad translator v%s', version);
+    console.log('Usage: %s <input-file>',       __filename);
+    process.exit(1);
+}
 
-//
-//
-//
-console.log('gcode-to-scad translator');
+var fs       =  require('fs'),
+    readline = require('readline');
+
+var input_filename = process.argv[2];
+if (!fs.existsSync(input_filename)) {
+    console.error('File "%s" does not exists!!!', input_filename);
+    process.exit(2);
+}
 
 //
 //
@@ -13,6 +22,10 @@ var printer = {
     y: 0,
     z: 0,
     e: 0,
+
+    //
+    //
+    //
     home: function () {
         this.x = 0;
         this.y = 0;
@@ -66,6 +79,10 @@ var printer = {
     }
 };
 
+//
+// The cb @on_line called once per each line from @input_filename
+// It parse G code and calls the @printer
+//
 function on_line(line) {
     var l = line.trimLeft(); if (!l.length || l[0] === ';') return;
     var a = l.split(' ');
@@ -108,8 +125,9 @@ function on_line(line) {
 }
 
 //
+// Read @input_filename line by line and process via @on_line cb
 //
-//
-require('readline').createInterface({
-   input: require('fs').createReadStream(input_filename)
+readline.createInterface({
+    terminal: false, //
+    input: fs.createReadStream(input_filename)
 }).on('line', on_line);
