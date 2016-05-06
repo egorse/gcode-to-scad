@@ -45,6 +45,7 @@ var printer = {
         if (has_e) this.e = pos.e;
         //console.info('Printer possition X:%d, Y:%d, Z:%d, E:%d', this.x, this.y, this.z, this.e);
     },
+    layer: 0,
     move: function (pos) {
         const has_x = pos.hasOwnProperty('x'),
               has_y = pos.hasOwnProperty('y'),
@@ -52,7 +53,10 @@ var printer = {
               has_e = pos.hasOwnProperty('e');
 
         if (!has_x && !has_y && has_z && !has_e) { // Z only move
+            if (this.layer != 0) console.log('}');
+            ++this.layer;
             this.z = pos.z;
+            console.log('union () { // Layer %d', this.layer);
         } else if (has_x && has_y && !has_z && !has_e) { // Move
             this.x = pos.x;
             this.y = pos.y;
@@ -62,7 +66,7 @@ var printer = {
             this.e = pos.e;
         } else if (has_x && has_y && !has_z && has_e && this.e < pos.e && (this.x != pos.x || this.y != pos.y)) { // Move and extrude
 
-            console.log('segment(a=[%d,%d], b=[%d,%d], z=%d);',
+            console.log('    segment(a=[%d,%d], b=[%d,%d], z=%d);',
                 this.x, this.y,
                 pos.x,  pos.y,
                 this.z);
